@@ -1,0 +1,23 @@
+{
+  "name": "twilio-cloudflare-workers",
+  "version": "1.0.0",
+  "description": "Cryptographically verify incoming [Twilio](https://www.twilio.com/docs/api/security) webhooks in a [CloudFlare Worker](https://blog.cloudflare.com/introducing-cloudflare-workers/).",
+  "main": "twilio-request-validation.js",
+  "scripts": {
+    "upload-twilio-auth-to-tgonzalez": "npm run upload-worker -- --secrets-path C:\\Users\\peon\\Desktop\\personal.json --zone tgonzalez.net --path C:\\Users\\peon\\Desktop\\projects\\TwilioCloudFlareWorkerRequestValidation\\src\\workers\\twilio-request-validation.js",
+    "upload-worker": "node ./src/upload-worker.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timg456789/TwilioCloudFlareWorkerRequestValidation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/timg456789/TwilioCloudFlareWorkerRequestValidation/issues"
+  },
+  "homepage": "https://github.com/timg456789/TwilioCloudFlareWorkerRequestValidation#readme",
+  "dependencies": {
+    "node-fetch-npm": "2.0.2"
+  }
+}

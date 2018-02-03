@@ -2,26 +2,36 @@ addEventListener('fetch', event => {
     event.respondWith(fetchAndApply(event.request))
 });
 
+/* WARNING:
+    Anything starting with REPLACEABLE_SECRET_VDB12_ shouldn't be renamed,
+    because they are used in deployment transformations.
+    Do not remove the comment below,
+    it is required to timestamp workers on upload.
+    Sent from npm.
+*/
+/* REPLACEABLE_SECRET_VDB12_TIMESTAMP */
 async function fetchAndApply(request) {
-    let twilioToken = '';
+    let twilioToken = 'REPLACEABLE_SECRET_VDB12_TWILIO_TOKEN';
     let content = await readStreamToEnd(request.body.getReader());
     let twilioSignature = request.headers.get('X-Twilio-Signature');
-    let twilioPath = 'tgonzalez.net/api/twilio';
-    if (request.url.indexOf('https://' + twilioPath) > -1 ||
-        request.url.indexOf('http://' + twilioPath) > -1) {
-        let twilioPayload = await getSignatureData(request.url, content);
-        let reproduced = CryptoJS.HmacSHA1(twilioPayload, twilioToken).toString(CryptoJS.enc.Base64);
-        if (twilioSignature !== reproduced) {
-            return new Response('Request must be signed by Twilio.',
-                { status: 403, statusText: 'Forbidden' })
-        }
+    let twilioPayload = await getSignatureData(request.url, content);
+    let reproduced = CryptoJS.HmacSHA1(twilioPayload, twilioToken).toString(CryptoJS.enc.Base64);
+    if (twilioSignature !== reproduced) {
+        return new Response('Request must be signed by Twilio. Provided signature ' + twilioSignature +
+            ' Twilio Signature Data ' + twilioPayload,
+            { status: 403, statusText: 'Forbidden' })
     }
     const response = await fetch(new Request(request.url, {
         method: 'POST',
         headers: { 'X-Twilio-Signature': twilioSignature },
         body: content
     }));
-    return response
+    return response;
+}
+
+function decodeUriComponentPlusesToSpaces(data) {
+    data = data.replace('+', ' ');
+    return decodeURIComponent(data);
 }
 
 async function getSignatureData(url, body) {
@@ -29,8 +39,8 @@ async function getSignatureData(url, body) {
     body.split('&').sort().forEach(function(kvp) {
         let splitPair = kvp.split('=');
         text = text +
-            decodeURIComponent(splitPair[0]) +
-            decodeURIComponent(splitPair[1]);
+            decodeUriComponentPlusesToSpaces(splitPair[0]) +
+            decodeUriComponentPlusesToSpaces(splitPair[1]);
     });
     return text;
 }
